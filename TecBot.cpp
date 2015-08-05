@@ -4,6 +4,8 @@ TecBot::TecBot(Servo *left, Servo *right)
 {
   _leftMotor = left;
   _rightMotor = right;
+  leftTrim = 0;
+  rightTrim = 0;
   stop();
 }
 
@@ -30,7 +32,11 @@ void TecBot::registerMotors(Servo *left, Servo *right)
  */
 void TecBot::driveTank(int left, int right, bool invLeft, bool invRight)
 {
-  //Trim left and right motor values to a range of [0, 180].
+  //Compensate for trim
+  left += leftTrim;
+  right += rightTrim;
+
+  //Bound left and right motor values to a range of [0, 180].
   left = (left > 180) ? 180 : left;
   left = (left < 0) ? 0 : left;
   right = (right > 180) ? 180 : right;
@@ -89,6 +95,17 @@ void TecBot::driveArcade(int magnitude, int rotation, bool invDir, bool invTurn)
  */
 void TecBot::stop()
 {
-  (*_leftMotor).write(DRIVE_STOP);
-  (*_rightMotor).write(DRIVE_STOP);
+  (*_leftMotor).write(90);
+  (*_rightMotor).write(90);
+}
+
+void TecBot::setTrim(int trim)
+{
+  setTrim(trim/2, -trim/2);
+}
+
+void TecBot::setTrim(int left, int right)
+{
+  leftTrim = left;
+  rightTrim = right;
 }
